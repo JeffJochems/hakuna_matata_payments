@@ -29,13 +29,21 @@ class MailchimpClient:
         """
         members_response = self.client.lists.get_list_members_info(list_id=self.campaign_list_id)
         attendees = []
+
         for member in members_response["members"]:
-            # TODO: Fill attendee info
-            id = ""
-            name = ""
-            payment_status = ""
-            attendees.append(Attendee(id, name, payment_status))
-        print(attendees)
+            # Collect attendee properties
+            id = member["id"]
+            unique_email_id = member["unique_email_id"]
+            contact_id = member["contact_id"]
+            email = member["email_address"]
+            first_name = member["merge_fields"]["FNAME"]
+            last_name = member["merge_fields"]["LNAME"]
+            customer_journey = member["merge_fields"]["C_JOURNEY"]
+            payment_link = member["merge_fields"]["PAY_LINK"]
+            payment_link_id = member["merge_fields"]["PAY_LINK_I"]
+
+            attendees.append(Attendee(id, email, first_name, last_name, customer_journey, unique_email_id, contact_id, payment_link, payment_link_id))
+
         return attendees
 
     def test_connection(self) -> str:

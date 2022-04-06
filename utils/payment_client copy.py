@@ -1,6 +1,6 @@
 import requests
 
-class PaypalClient:
+class PaymentClient:
     """
     """
 
