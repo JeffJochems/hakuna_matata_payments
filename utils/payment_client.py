@@ -22,6 +22,7 @@ class PaymentClient:
 
     def retrieve_payment_links(self) -> list:
         """
+        TODO: Change to mollie client implementation
         """
         payment_links = []
 

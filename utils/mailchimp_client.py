@@ -33,16 +33,16 @@ class MailchimpClient:
         for member in members_response["members"]:
             # Collect attendee properties
             id = member["id"]
+            list_id = member["list_id"]
             unique_email_id = member["unique_email_id"]
-            contact_id = member["contact_id"]
             email = member["email_address"]
             first_name = member["merge_fields"]["FNAME"]
             last_name = member["merge_fields"]["LNAME"]
-            customer_journey = member["merge_fields"]["C_JOURNEY"]
             payment_link = member["merge_fields"]["PAY_LINK"]
             payment_link_id = member["merge_fields"]["PAY_LINK_I"]
+            customer_journey = customer_journey_from_mailchimp_tags(member["tags"])
 
-            attendees.append(Attendee(id, email, first_name, last_name, customer_journey, unique_email_id, contact_id, payment_link, payment_link_id))
+            attendees.append(Attendee(id, list_id, email, first_name, last_name, unique_email_id, payment_link, payment_link_id, customer_journey))
 
         return attendees
 
@@ -52,3 +52,41 @@ class MailchimpClient:
         """
         response = self.client.ping.get()
         print(response)
+
+    def register_pending_payment(self, attendee, payment_link) -> None:
+        """
+        Registers a pending payment in mailchimp by updating the customer journey tags and payment link (id) fields
+        :param attendee: the attendee to update
+        :param payment_link: the payment link to register
+        """
+        # set payment link and payment link id
+        self.client.lists.update_list_member(attendee.list_id, attendee.id, {"merge_fields": {"PAY_LINK": payment_link.payment_link_url, "PAY_LINK_I": payment_link.id}})
+
+        # add payment pending tag
+        self.client.lists.update_list_member_tags(attendee.list_id, attendee.id, {"tags": [{"name": "payment pending", "status": "active"}]})
+
+    def register_complete_payment(self, attendee) -> None:
+        """
+        Registers a complete payment in mailchimp by updating the customer journey tags
+        :param attendee: the attendee to update
+        """
+        self.client.lists.update_list_member_tags(attendee.list_id, attendee.id, {"tags": [
+            {"name": "payment pending", "status": "inactive"},
+            {"name": "payment complete", "status": "active"}
+            ]})
+
+
+def customer_journey_from_mailchimp_tags(tags: list):
+    """ 
+    Comverts a list of mailchimp tags to the customer journey step
+    :param tags: The tags associated with a member
+    :returns: a customer journey step (string)
+    """
+    if len(tags) == 0:
+        return "new"
+    elif len(tags) == 1 and tags[0]['name'] == "payment pending":
+        return "payment pending"
+    elif len(tags) == 1 and tags[0]['name']  == "payment complete":
+        return "payment complete"
+    else:
+        raise ValueError(f"Customer journey could not be obtained from mailchimp tags: {tags}")

@@ -43,15 +43,32 @@ def main():
     payment_links = payment_api_client.retrieve_payment_links()
 
     # 3. Set newly paid statuses
-    # register_new_payments()
+    register_complete_payments(mailchimp_api_client, attendees, payment_links)
     # mailchimp_api_client.register_paypal_payments(attendees, collected_payments)
 
-    # # 4. Send new payment requests
-    # send_new_payment_requests()
+    # # 4. Send new payment requests and register payment pending statuses
+    send_new_payment_requests(mailchimp_api_client, payment_api_client, attendees)
     # new_payment_requests = paypal_api_client.get_payment_requests(attendees)
     # payment_api_client.create_payment_link("Testvoornaam", "Testachternaam", "Testemail@mail.com")
     # mailchimp_api_client.set_payment_requests(attendees, new_payment_requests)
 
+
+def register_complete_payments(mailchimp_api_client, attendees, payment_links):
+    """
+    """
+    for attendee in attendees:
+        if attendee.customer_journey == "payment pending":
+            for payment_link in payment_links:
+                if attendee.payment_link_id == payment_link.id and payment_link.is_paid():
+                    mailchimp_api_client.register_complete_payment(attendee)
+
+def send_new_payment_requests(mailchimp_api_client, payment_api_client, attendees):
+    """
+    """
+    for attendee in attendees:
+        if attendee.customer_journey == "new":
+            payment_link = payment_api_client.create_payment_link(attendee.first_name, attendee.last_name, attendee.email)
+            mailchimp_api_client.register_pending_payment(attendee, payment_link)
 
 if __name__ == "__main__":
     main()
