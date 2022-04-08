@@ -8,13 +8,15 @@ class MailchimpClient:
     This marketing api client is based on the following rest API documentation: https://github.com/mailchimp/mailchimp-marketing-python#installation--usage
     """
 
-    def __init__(self, server, api_key, campaign_list_id) -> None:
+    def __init__(self, server, api_key, campaign_list_id, verification_wf_id, verification_wf_email_id) -> None:
         """
         Initializes the mailchimp marketeing API client.
         """
         self.server = server
         self.api_key = api_key
         self.campaign_list_id = campaign_list_id
+        self.verification_wf_id = verification_wf_id
+        self.verification_wf_email_id = verification_wf_email_id
 
         self.client = MailchimpMarketing.Client()
         self.client.set_config({
@@ -70,10 +72,14 @@ class MailchimpClient:
         Registers a complete payment in mailchimp by updating the customer journey tags
         :param attendee: the attendee to update
         """
+        # add paid tag
         self.client.lists.update_list_member_tags(attendee.list_id, attendee.id, {"tags": [
             {"name": "payment pending", "status": "inactive"},
             {"name": "payment complete", "status": "active"}
             ]})
+        
+        # trigger thanks for paying event
+        self.client.automations.add_workflow_email_subscriber(self.verification_wf_id, self.verification_wf_email_id, {"email_address": attendee.email})
 
 
 def customer_journey_from_mailchimp_tags(tags: list):

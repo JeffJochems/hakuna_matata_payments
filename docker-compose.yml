@@ -1,0 +1,13 @@
+version: "3.7"
+
+services:
+  hakuna_matata_payments:
+    build: ""
+    volumes:
+      - ./src:/opt/hakuna_matata/payments_app/src
+    env_file:
+      - .env
+    ports:
+      - "5000:5000"
+    healthcheck:
+      test: "nc -z 127.0.0.1 5000"

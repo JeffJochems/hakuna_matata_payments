@@ -15,6 +15,7 @@ TODO: rewrite documentation of payment process
 """
 
 import os
+from datetime import datetime, date
 from utils.mailchimp_client import MailchimpClient
 from utils.payment_client import PaymentClient
 
@@ -24,6 +25,8 @@ def main():
     mailchimp_api_server = os.getenv("MAILCHIMP_API_SERVER")
     mailchimp_api_key = os.getenv("MAILCHIMP_API_KEY")
     mailchimp_campaign_list_id = os.getenv("MAILCHIMP_CAMPAIGN_LIST_ID")
+    mailchimp_verification_wf_id = os.getenv("MAILCHIMP_VERIFICATION_WF_ID")
+    mailchimp_verification_wf_email_id = os.getenv("MAILCHIMP_VERIFICATION_WF_EMAIL_ID")
     # paypal_server_url = os.getenv("PAYPAL_SERVER_URL")
     # paypal_client_id = os.getenv("PAYPAL_CLIENT_ID")
     # paypal_api_secret = os.getenv("PAYPAL_API_SECRET")
@@ -33,7 +36,7 @@ def main():
     mollie_api_profile_id = os.getenv("MOLLIE_API_PROFILE_ID")
 
     # Initialize API clients
-    mailchimp_api_client = MailchimpClient(mailchimp_api_server, mailchimp_api_key, mailchimp_campaign_list_id)
+    mailchimp_api_client = MailchimpClient(mailchimp_api_server, mailchimp_api_key, mailchimp_campaign_list_id, mailchimp_verification_wf_id, mailchimp_verification_wf_email_id)
     payment_api_client = PaymentClient(mollie_api_url, mollie_api_key, mollie_api_partner_id, mollie_api_profile_id) 
 
     # 1. Collect current mailchimp subscriptions
@@ -51,6 +54,8 @@ def main():
     # new_payment_requests = paypal_api_client.get_payment_requests(attendees)
     # payment_api_client.create_payment_link("Testvoornaam", "Testachternaam", "Testemail@mail.com")
     # mailchimp_api_client.set_payment_requests(attendees, new_payment_requests)
+    now, today = datetime.now(), date.today()
+    print(today.strftime("%d/%m/%Y") + " " + now.strftime("%H:%M:%S") + " script complete")
 
 
 def register_complete_payments(mailchimp_api_client, attendees, payment_links):
