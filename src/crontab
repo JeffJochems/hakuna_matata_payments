@@ -1,1 +1,1 @@
-5 * * * * python /opt/hakuna_matata/payments_app/src/hakuna_matata_payment_script.py
+5 * * * * python -u /opt/hakuna_matata/payments_app/src/hakuna_matata_payment_script.py

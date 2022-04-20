@@ -1,13 +1,21 @@
 import requests
+import logging
 from mollie.api.client import Client
 from utils.payment_link import PaymentLink
 
 class PaymentClient:
     """
+    A mollie payments client able to communicate with the mollie API.
+    This marketing api client is based on the following rest API documentation: https://docs.mollie.com
     """
 
     def __init__(self, mollie_api_url: str, mollie_api_key: str, mollie_api_partner_id: str, mollie_api_profile_id: str) -> None:
         """ 
+        Initializes the mollie payment client api and configures its parameters.
+        :param mollie_api_url: The url of the mollie api server
+        :param mollie_api_key: The API key of the mollie user
+        :param mollie_api_partner_id: The user partner id of the mollie user 
+        :param mollie_api_profile_id: The user profile id of the mollie user
         """
         self.mollie_api_url = mollie_api_url
         self.mollie_api_key = mollie_api_key
@@ -22,39 +30,33 @@ class PaymentClient:
 
     def retrieve_payment_links(self) -> list:
         """
-        TODO: Change to mollie client implementation
+        Retrieves the active payment links from mollie.
         """
-        payment_links = []
-
-        url = self.mollie_api_url + "/payment-links"
-        payment_links_leftover = True
-        while payment_links_leftover:
-            # perform a mollie API request
-            response = requests.get(url=url, headers=self.mollie_api_headers)
-            json_response = response.json()
-
-            # Create payment link object
-            for payment_link_dict in json_response["_embedded"]["payment_links"]:
-                payment_links.append(payment_link_dict_to_obj(payment_link_dict))
-            
-            if json_response["_links"]["next"] is None:
-                payment_links_leftover = False
-            else:
-                url = json_response["_links"]["next"]
+        response_payment_links = self.client.payment_links.list()
+        payment_links = [payment_link_dict_to_obj(payment_link_dict) for payment_link_dict in response_payment_links["_embedded"]["payment_links"]]
+        logging.info(f"Retrieved a list of {len(payment_links)} payment links from Mollie")
 
         return payment_links
 
-    def create_payment_link(self, first_name, last_name, email) -> PaymentLink:
+    def create_payment_link(self, first_name: str, last_name: str, email: str) -> PaymentLink:
         """
+        Creates a new payment link for a new attendee.
+        :param first_name: The first name of the new attendee
+        :param last_name: The last name of the new attendee
+        :param email: The email adress of the new attendee
         """
         description = f"Hakuna Matata zondag ticket inclusief eten voor: {first_name} {last_name} \n verstuurd naar {email}"
         payment_link_dict = self.client.payment_links.create({"description" : description, "amount" : self.default_amount, "expiresAt": "2022-06-07T11:00:00+00:00"})
         payment_link = payment_link_dict_to_obj(payment_link_dict)
+        logging.info(f"Created a mollie payment link for {first_name} {last_name}, {email}")
+
         return payment_link
 
 
 def payment_link_dict_to_obj(payment_link_dict: dict) -> PaymentLink:
     """
+    Collects the information from a payment link dictionairy and instantiates a payment link object.
+    :param payment_link_dict: The dictionairy to instantiate an object from
     """
     id = payment_link_dict["id"]
     payment_link_url = payment_link_dict["_links"]["paymentLink"]["href"]
