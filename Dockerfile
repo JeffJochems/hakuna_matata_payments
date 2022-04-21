@@ -26,4 +26,4 @@ WORKDIR $HAKUNA_MATATA_APP_PATH/src
 RUN crontab crontab
 RUN touch /var/log/cron.log
 
-CMD crond -f
+CMD crond -f -l 2

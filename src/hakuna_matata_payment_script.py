@@ -19,7 +19,7 @@ from utils.payment_client import PaymentClient
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 formatter = logging.Formatter('%(asctime)s;%(levelname)s;%(message)s', "%Y-%m-%d %H:%M:%S")
-logging_handler = TimedRotatingFileHandler(os.getcwd() + '/logs/hakuna_matata_payments_prod.log', when='d', interval=1, backupCount=14)
+logging_handler = TimedRotatingFileHandler(os.path.dirname(os.path.abspath(__file__)) + '/logs/hakuna_matata_payments_prod.log', when='d', interval=1, backupCount=14)
 logging_handler.setLevel(logging.INFO)
 logging_handler.setFormatter(formatter)
 logger.addHandler(logging_handler)

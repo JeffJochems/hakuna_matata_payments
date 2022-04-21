@@ -5,7 +5,7 @@ services:
     build: ""
     volumes:
       - ./src:/opt/hakuna_matata/payments_app/src
-      - ./log_on_host:/opt/hakuna_matata/payments_app/src/logs
+      - ./logs:/opt/hakuna_matata/payments_app/src/logs
     env_file:
       - .env
     ports:
