@@ -1,3 +1,4 @@
+from optparse import Values
 import requests
 import logging
 from mollie.api.client import Client
@@ -26,7 +27,6 @@ class PaymentClient:
         self.mollie_api_headers["Authorization"] = f"Bearer {self.mollie_api_key}"
         self.client = Client()
         self.client.set_api_key(self.mollie_api_key)
-        self.default_amount = {"currency": "EUR", "value": "10.00"}
 
     def retrieve_payment_links(self) -> list:
         """
@@ -38,17 +38,18 @@ class PaymentClient:
 
         return payment_links
 
-    def create_payment_link(self, first_name: str, last_name: str, email: str) -> PaymentLink:
+    def create_payment_link(self, first_name: str, last_name: str, email: str, amount: int, value: float) -> PaymentLink:
         """
         Creates a new payment link for a new attendee.
         :param first_name: The first name of the new attendee
         :param last_name: The last name of the new attendee
         :param email: The email adress of the new attendee
         """
-        description = f"Hakuna Matata zondag ticket inclusief eten voor: {first_name} {last_name} \n verstuurd naar {email}"
-        payment_link_dict = self.client.payment_links.create({"description" : description, "amount" : self.default_amount, "expiresAt": "2022-06-07T11:00:00+00:00"})
+        payment_amount = {"value": "{:.2f}".format(value), "currency": "EUR"}
+        description = f"{amount} Hakuna Matata zondag tickets inclusief eten ({value} eu) voor: {first_name} {last_name} \n verstuurd naar {email}"
+        payment_link_dict = self.client.payment_links.create({"description" : description, "amount" : payment_amount, "expiresAt": "2022-06-07T11:00:00+00:00"})
         payment_link = payment_link_dict_to_obj(payment_link_dict)
-        logging.info(f"Created a mollie payment link for {first_name} {last_name}, {email}")
+        logging.info(f"Created a mollie payment link for {first_name} {last_name}, {email}, {amount} tickets, {value} eu")
 
         return payment_link
 

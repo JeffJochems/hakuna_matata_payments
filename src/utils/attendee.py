@@ -3,7 +3,7 @@ class Attendee:
     An attendee which either has or has not payed his or her ticket
     """
 
-    def __init__(self, id: str, list_id: str, email: str , first_name: str, last_name: str, unique_email_id: str, payment_link: str, payment_link_id: str, customer_journey: str) -> None:
+    def __init__(self, id: str, list_id: str, email: str , first_name: str, last_name: str, unique_email_id: str, payment_link: str, payment_link_id: str, customer_journey: str, amount_tickets: int) -> None:
         """
         Initializes the attendee object
         """
@@ -16,6 +16,8 @@ class Attendee:
         self.payment_link = payment_link
         self.payment_link_id = payment_link_id
         self.customer_journey = customer_journey
+        self.amount_tickets = amount_tickets
+        self.value_tickets = (8.5 * self.amount_tickets) + 0.30
     
     def has_payed(self) -> bool:
         """

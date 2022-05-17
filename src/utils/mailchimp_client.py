@@ -44,9 +44,10 @@ class MailchimpClient:
             last_name = member["merge_fields"]["LNAME"]
             payment_link = member["merge_fields"]["PAY_LINK"]
             payment_link_id = member["merge_fields"]["PAY_LINK_I"]
+            amount_tickets = member["merge_fields"]["MERGE4"]
             customer_journey = customer_journey_from_mailchimp_tags(member["tags"])
 
-            attendees.append(Attendee(id, list_id, email, first_name, last_name, unique_email_id, payment_link, payment_link_id, customer_journey))
+            attendees.append(Attendee(id, list_id, email, first_name, last_name, unique_email_id, payment_link, payment_link_id, customer_journey, amount_tickets))
 
         logging.info(f"Retrieved a list of {len(attendees)} attendees")
 
