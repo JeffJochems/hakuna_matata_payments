@@ -30,7 +30,7 @@ class MailchimpClient:
         Retrieves the subscirbed attendees from mailchimp
         :returns: a list of subscribed attendees
         """
-        members_response = self.client.lists.get_list_members_info(list_id=self.campaign_list_id)
+        members_response = self.client.lists.get_list_members_info(list_id=self.campaign_list_id, count=1000)
 
         attendees = []
 
