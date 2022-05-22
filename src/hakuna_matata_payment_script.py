@@ -86,7 +86,7 @@ def send_new_payment_requests(mailchimp_api_client: MailchimpClient, payment_api
     """
     performed_new_payment_request = False
     for attendee in attendees:
-        if attendee.customer_journey == "new":
+        if attendee.customer_journey == "new" and attendee.amount_tickets > 0:
             payment_link = payment_api_client.create_payment_link(attendee.first_name, attendee.last_name, attendee.email, attendee.amount_tickets, attendee.value_tickets)
             mailchimp_api_client.register_pending_payment(attendee, payment_link)
             performed_new_payment_request = True
