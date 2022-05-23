@@ -32,7 +32,7 @@ class PaymentClient:
         """
         Retrieves the active payment links from mollie.
         """
-        response_payment_links = self.client.payment_links.list()
+        response_payment_links = self.client.payment_links.list(limit=250)
         payment_links = [payment_link_dict_to_obj(payment_link_dict) for payment_link_dict in response_payment_links["_embedded"]["payment_links"]]
         logging.info(f"Retrieved a list of {len(payment_links)} payment links from Mollie")
 
